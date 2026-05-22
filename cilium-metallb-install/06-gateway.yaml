@@ -1,0 +1,12 @@
+# 06-gateway.yaml
+apiVersion: gateway.networking.k8s.io/v1
+kind: Gateway
+metadata:
+  name: web-gateway
+  namespace: hse-llm-project
+spec:
+  gatewayClassName: cilium    # Cilium выступает реализацией Gateway API
+  listeners:
+    - name: http
+      protocol: HTTP
+      port: 80

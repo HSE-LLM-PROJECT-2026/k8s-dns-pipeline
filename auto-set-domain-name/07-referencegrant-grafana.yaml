@@ -1,0 +1,15 @@
+# dns-pipeline/07-referencegrant-grafana.yaml
+apiVersion: gateway.networking.k8s.io/v1beta1
+kind: ReferenceGrant
+metadata:
+  name: allow-grafana-from-hse-routes
+  namespace: monitoring
+spec:
+  from:
+    - group: gateway.networking.k8s.io
+      kind: HTTPRoute
+      namespace: hse-llm-project
+  to:
+    - group: ""
+      kind: Service
+      name: kube-prometheus-stack-grafana

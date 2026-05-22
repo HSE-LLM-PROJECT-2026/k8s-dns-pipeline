@@ -1,0 +1,95 @@
+# Public edge domain -> internal Gateway hostnames
+#
+# Caddy runs outside the cluster and forwards traffic to the Kubernetes Gateway.
+# Prefer NodePort targets to avoid VIP reachability issues after reboots.
+# Gateway NodePort: 32211 (service cilium-gateway-web-gateway)
+# Node IPs: 10.19.87.10, 10.19.87.11, 10.19.87.12, 10.19.87.14, 10.19.87.15
+#
+# External domain: *.hse-llm-project-2026.ru
+# Internal Gateway hostnames: *.hse-llm.internal
+
+{
+    # Optional contact email for ACME issuers
+    # email you@example.com
+}
+
+# Frontend
+frontend.hse-llm-project-2026.ru {
+    reverse_proxy 10.19.87.10:32211 10.19.87.11:32211 10.19.87.12:32211 10.19.87.14:32211 10.19.87.15:32211 {
+        header_up Host frontend.hse-llm.internal
+    }
+}
+
+# Deployment API
+deployment.hse-llm-project-2026.ru {
+    reverse_proxy 10.19.87.10:32211 10.19.87.11:32211 10.19.87.12:32211 10.19.87.14:32211 10.19.87.15:32211 {
+        header_up Host deployment.hse-llm.internal
+    }
+}
+
+# Security/Audit API
+audit.hse-llm-project-2026.ru {
+    reverse_proxy 10.19.87.10:32211 10.19.87.11:32211 10.19.87.12:32211 10.19.87.14:32211 10.19.87.15:32211 {
+        header_up Host audit.hse-llm.internal
+    }
+}
+
+# Grafana
+grafana.hse-llm-project-2026.ru {
+    reverse_proxy 10.19.87.10:32211 10.19.87.11:32211 10.19.87.12:32211 10.19.87.14:32211 10.19.87.15:32211 {
+        header_up Host grafana.hse-llm.internal
+        # Grafana CSRF check compares Origin with backend-visible host.
+        # We rewrite Origin/Referer to the same internal host as Host header.
+        header_up Origin https://grafana.hse-llm.internal
+        header_up Referer https://grafana.hse-llm.internal
+    }
+}
+
+# Status frontend
+status.hse-llm-project-2026.ru {
+    reverse_proxy 10.19.87.10:32211 10.19.87.11:32211 10.19.87.12:32211 10.19.87.14:32211 10.19.87.15:32211 {
+        header_up Host status.hse-llm.internal
+    }
+}
+
+# Status API
+status-api.hse-llm-project-2026.ru {
+    reverse_proxy 10.19.87.10:32211 10.19.87.11:32211 10.19.87.12:32211 10.19.87.14:32211 10.19.87.15:32211 {
+        header_up Host status-api.hse-llm.internal
+    }
+}
+
+# Multi-cluster product demo frontend
+multicluster-demo.hse-llm-project-2026.ru {
+    reverse_proxy 10.19.87.10:32211 10.19.87.11:32211 10.19.87.12:32211 10.19.87.14:32211 10.19.87.15:32211 {
+        header_up Host multicluster-demo.hse-llm.internal
+    }
+}
+
+# MinIO Console UI
+# Host is preserved as minio.hse-llm-project-2026.ru (public listener/HTTPRoute handles it).
+minio.hse-llm-project-2026.ru {
+    reverse_proxy 10.19.87.10:32211 10.19.87.11:32211 10.19.87.12:32211 10.19.87.14:32211 10.19.87.15:32211
+}
+
+# PostgreSQL UI (pgAdmin)
+# Host is preserved as postgres.hse-llm-project-2026.ru (public listener/HTTPRoute handles it).
+postgres.hse-llm-project-2026.ru {
+    reverse_proxy 10.19.87.10:32211 10.19.87.11:32211 10.19.87.12:32211 10.19.87.14:32211 10.19.87.15:32211
+}
+
+# Example for one LLM deployment
+# Add one block per model endpoint when you create a new HTTPRoute.
+#
+# model1.hse-llm-project-2026.ru {
+#     reverse_proxy 10.19.87.10:32211 10.19.87.11:32211 10.19.87.12:32211 10.19.87.14:32211 10.19.87.15:32211 {
+#         header_up Host model1.hse-llm.internal
+#     }
+# }
+
+# Existing demo route from your setup
+demo.hse-llm-project-2026.ru {
+    reverse_proxy 10.19.87.10:32211 10.19.87.11:32211 10.19.87.12:32211 10.19.87.14:32211 10.19.87.15:32211 {
+        header_up Host demo.hse-llm.internal
+    }
+}

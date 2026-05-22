@@ -1,0 +1,78 @@
+# dns-pipeline/02-coredns-external.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: coredns-external
+  namespace: hse-llm-project
+data:
+  Corefile: |
+    hse-llm.internal:53 {
+        etcd {
+            path /skydns
+            endpoint http://etcd-dns.hse-llm-project.svc.cluster.local:2379
+        }
+        errors
+        log
+        cache 30
+    }
+    .:53 {
+        forward . /etc/resolv.conf
+        errors
+        cache 30
+    }
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: coredns-external
+  namespace: hse-llm-project
+  labels:
+    app: coredns-external
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: coredns-external
+  template:
+    metadata:
+      labels:
+        app: coredns-external
+    spec:
+      containers:
+        - name: coredns
+          image: coredns/coredns:1.12.0
+          args: ["-conf", "/etc/coredns/Corefile"]
+          ports:
+            - containerPort: 53
+              protocol: UDP
+              name: dns
+            - containerPort: 53
+              protocol: TCP
+              name: dns-tcp
+          volumeMounts:
+            - name: config
+              mountPath: /etc/coredns
+              readOnly: true
+      volumes:
+        - name: config
+          configMap:
+            name: coredns-external
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: coredns-external
+  namespace: hse-llm-project
+spec:
+  type: LoadBalancer          # MetalLB выдаст внешний IP
+  selector:
+    app: coredns-external
+  ports:
+    - port: 53
+      targetPort: 53
+      protocol: UDP
+      name: dns
+    - port: 53
+      targetPort: 53
+      protocol: TCP
+      name: dns-tcp

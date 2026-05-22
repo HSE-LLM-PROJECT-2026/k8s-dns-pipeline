@@ -1,0 +1,21 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: coredns-external
+  namespace: hse-llm-project
+data:
+  Corefile: |
+    hse-llm.internal:53 {
+        etcd {
+            path /skydns
+            endpoint http://etcd-dns.hse-llm-project.svc.cluster.local:2379
+        }
+        errors
+        log
+        cache 30
+    }
+    .:53 {
+        forward . /etc/resolv.conf
+        errors
+        cache 30
+    }
