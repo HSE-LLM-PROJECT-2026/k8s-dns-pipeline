@@ -59,13 +59,6 @@ status-api.hse-llm-project-2026.ru {
     }
 }
 
-# Multi-cluster product demo frontend
-multicluster-demo.hse-llm-project-2026.ru {
-    reverse_proxy 10.19.87.10:32211 10.19.87.11:32211 10.19.87.12:32211 10.19.87.14:32211 10.19.87.15:32211 {
-        header_up Host multicluster-demo.hse-llm.internal
-    }
-}
-
 # MinIO Console UI
 # Host is preserved as minio.hse-llm-project-2026.ru (public listener/HTTPRoute handles it).
 minio.hse-llm-project-2026.ru {
