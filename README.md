@@ -1,24 +1,54 @@
-# K8s DNS Pipeline
+# Kubernetes DNS Pipeline
+
+[HSE-LLM-PROJECT-2026/k8s-dns-pipeline](https://github.com/HSE-LLM-PROJECT-2026/k8s-dns-pipeline)
 
 ## Описание
 
-Сетевой контур и DNS/ingress-пайплайн платформы: маршрутизация сервисов, внешняя публикация endpoint, интеграция с Cilium/MetalLB/CoreDNS/ExternalDNS.
+Репозиторий сетевого слоя платформы: Cilium, MetalLB, Gateway API, external-dns, CoreDNS и HTTPRoute для публичных доменов. Через него сервисы получают нормальные entrypoints наружу.
 
 ## Основные возможности
 
-- deployment service networks и service routes
-- scripts для массового rollout/teardown сетевого контура
-- манифесты CoreDNS/ExternalDNS/etcd и вспомогательные утилиты
+- установка Cilium и MetalLB
+- настройка Gateway API
+- external-dns и CoreDNS для внутренних/внешних имен
+- HTTPRoute для frontend, backend, Grafana, status и других сервисов
+- скрипты полного deploy/delete сетевого слоя
 
 ## Структура проекта
 
-- `scripts/` - основной набор deploy/verify/add-service скриптов
-- `manifests/` - yaml-манифесты сетевых компонентов
-- `cilium-metallb-install/` - отдельный профиль установки
-- `Caddyfile` - конфигурация edge-proxy
+- `cilium-metallb-install/` — Cilium/MetalLB/Gateway API manifests
+- `auto-set-domain-name/` — DNS, Gateway и HTTPRoute manifests
+- `scripts/` — deploy/delete/verify скрипты
+- `Caddyfile` — вспомогательная конфигурация reverse proxy
+- `*-guide.md` — заметки по настройке сети
 
 ## Быстрый старт
 
-- полный deployment: `scripts/deploy-all.sh`
-- проверка: `scripts/verify.sh`
-- откат: `scripts/teardown.sh`
+Полная раскатка:
+
+```bash
+cd scripts
+./deploy-from-scratch.sh
+```
+
+Только service routes:
+
+```bash
+cd scripts
+./deploy-service-routes.sh
+```
+
+Проверка:
+
+```bash
+cd scripts
+./verify.sh
+```
+
+## Важное
+
+Перед запуском нужно проверить IP pool MetalLB и домены в HTTPRoute manifests. Они завязаны на текущую сеть стенда.
+
+## Автор
+
+Igor Malysh
