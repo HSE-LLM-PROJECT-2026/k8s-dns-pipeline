@@ -1,7 +1,5 @@
 # Kubernetes DNS Pipeline
 
-[HSE-LLM-PROJECT-2026/k8s-dns-pipeline](https://github.com/HSE-LLM-PROJECT-2026/k8s-dns-pipeline)
-
 ## Описание
 
 Репозиторий сетевого слоя платформы: Cilium, MetalLB, Gateway API, external-dns, CoreDNS и HTTPRoute для публичных доменов. Через него сервисы получают нормальные entrypoints наружу.
